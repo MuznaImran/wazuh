@@ -2,403 +2,246 @@
 
 ## Overview
 
-Wazuh is an open-source cybersecurity platform that provides Security Information and Event Management (SIEM) and Extended Detection and Response (XDR) capabilities. It enables organizations to monitor endpoints, collect and analyze security events, detect threats, assess vulnerabilities, enforce security policies, and respond to incidents from a centralized platform.
+Wazuh is an open-source cybersecurity platform that combines **Security Information and Event Management (SIEM)** and **Extended Detection and Response (XDR)** capabilities into a single solution.
 
-Wazuh continuously collects security data from endpoints, servers, cloud environments, containers, and network devices, analyzes this information using built-in and custom detection rules, and presents actionable alerts through a centralized dashboard.
+It enables organizations to collect, analyze, correlate, and respond to security events across endpoints, servers, cloud environments, containers, virtual machines, and network devices from a centralized platform.
 
-Because Wazuh is open source, organizations can deploy enterprise-grade security monitoring without expensive licensing costs while maintaining flexibility and customization.
+By continuously monitoring systems for suspicious activity, configuration weaknesses, file modifications, vulnerabilities, and other security events, Wazuh helps organizations improve their overall security posture while simplifying security operations.
 
 ---
 
-# What Problems Does Wazuh Solve?
+# Why Was Wazuh Created?
 
-Modern organizations operate hundreds or even thousands of systems, each generating security logs and events.
+Modern IT infrastructures generate enormous volumes of logs and security events every day.
 
-Without a centralized platform, security teams would need to manually inspect logs from every server, workstation, firewall, application, and network device, making threat detection slow and inefficient.
+Without centralized monitoring, security teams would have to manually inspect logs from individual servers, workstations, applications, firewalls, and cloud services, making it difficult to detect attacks quickly.
 
-Wazuh addresses this challenge by:
+Wazuh addresses these challenges by providing:
 
-- Collecting logs from multiple sources
-- Normalizing and analyzing security events
-- Detecting suspicious behavior
-- Generating security alerts
-- Supporting automated incident response
-- Providing centralized visibility across the infrastructure
+- Centralized security monitoring
+- Continuous endpoint visibility
+- Threat detection
+- Automated alerting
+- Incident response
+- Compliance monitoring
+- Vulnerability assessment
+
+Instead of reviewing thousands of separate log files, analysts can monitor their entire infrastructure through a single platform.
 
 ---
 
 # Wazuh as a SIEM and XDR Platform
 
-Wazuh combines the capabilities of both a **Security Information and Event Management (SIEM)** platform and an **Extended Detection and Response (XDR)** platform.
+Wazuh combines capabilities traditionally found in both **SIEM** and **XDR** platforms.
 
-## SIEM Capabilities
+## SIEM
 
-As a SIEM, Wazuh focuses on collecting, storing, analyzing, and correlating security events from across an organization's infrastructure.
-
-Its SIEM capabilities include:
+As a SIEM platform, Wazuh provides:
 
 - Centralized log collection
+- Log analysis
 - Event correlation
-- Security alert generation
-- Log storage and indexing
+- Alert generation
 - Threat monitoring
 - Incident investigation
 - Compliance reporting
 
-These capabilities provide security teams with centralized visibility into their organization's security posture.
+Its SIEM functionality allows security teams to collect and analyze security events from many different sources through a centralized platform.
 
----
+## XDR
 
-## XDR Capabilities
+Beyond log management, Wazuh extends visibility directly to monitored endpoints.
 
-Beyond traditional SIEM functionality, Wazuh also provides several XDR capabilities that improve endpoint visibility and automate threat detection and response.
+Its XDR capabilities include:
 
-### File Integrity Monitoring (FIM)
+- File Integrity Monitoring (FIM)
+- Vulnerability Detection
+- Security Configuration Assessment (SCA)
+- Rootcheck
+- Active Response
+- Endpoint Inventory
 
-Monitors important files and directories for unauthorized modifications.
-
-### Vulnerability Detection
-
-Identifies vulnerable software installed on monitored endpoints using continuously updated vulnerability databases.
-
-### Security Configuration Assessment (SCA)
-
-Evaluates operating systems and applications against security best practices and compliance frameworks.
-
-### Rootcheck
-
-Detects indicators of rootkits, hidden processes, suspicious files, and other signs of system compromise.
-
-### Active Response
-
-Automatically executes predefined actions—such as blocking an IP address or terminating a malicious process—when specific security rules are triggered.
-
-### Endpoint Inventory
-
-Collects detailed information about hardware, installed software, operating systems, running processes, network interfaces, and open ports.
-
-These capabilities allow Wazuh to move beyond traditional log management and provide comprehensive endpoint detection and response.
+These capabilities allow Wazuh not only to detect security events but also to monitor endpoint health, identify vulnerabilities, enforce security baselines, and automatically respond to certain threats.
 
 ---
 
 # Key Features
 
-Wazuh provides a comprehensive set of security monitoring capabilities, including:
+Some of Wazuh's major capabilities include:
 
-- Endpoint Monitoring
-- Log Collection & Analysis
+- Centralized Log Collection
 - Threat Detection
-- File Integrity Monitoring (FIM)
+- Event Correlation
+- Endpoint Monitoring
 - Vulnerability Detection
+- File Integrity Monitoring (FIM)
 - Security Configuration Assessment (SCA)
-- Rootcheck
 - Active Response
+- Rootcheck
 - Endpoint Inventory
 - Compliance Monitoring
-- Cloud & Container Security
+- Cloud Monitoring
+- Container Security
 
 ---
 
-# Core Components
+# Where Can Wazuh Monitor?
 
-To provide these capabilities, Wazuh is built using several core components that work together to collect, analyze, store, and visualize security events.
-A standard Wazuh deployment consists of four primary components.
+Wazuh supports monitoring across a wide variety of environments.
 
-| Component | Purpose |
-|-----------|---------|
-| **Wazuh Manager (Server)** | Receives events from agents, analyzes logs using decoders and rules, generates alerts, and coordinates security monitoring. |
-| **Wazuh Agent** | Installed on monitored endpoints to collect logs, file changes, system information, vulnerabilities, and security events. |
-| **Wazuh Indexer** | Stores and indexes alerts and events, allowing fast searches and efficient data retrieval. |
-| **Wazuh Dashboard** | Provides the web interface used to visualize alerts, investigate incidents, manage agents, and administer the platform. |
-
----
-
-# Supporting Components
-
-In addition to its core components, some Wazuh deployments include supporting services that facilitate data transfer and integration between components.
-
-## Filebeat
-
-**Filebeat** is a lightweight log shipper developed by Elastic. In Wazuh deployments, it is used to forward alerts and events generated by the **Wazuh Manager** to the **Wazuh Indexer**, where they are stored, indexed, and made searchable through the Wazuh Dashboard.
-
-```
-Agent
-   │
-   ▼
-Manager
-   │
-   ▼
-Filebeat
-   │
-   ▼
-Indexer
-   │
-   ▼
-Dashboard
-```
-
-Although Filebeat does not perform security analysis or threat detection, it plays an important role in transporting alert data between components in many Wazuh deployments.
-
-### Version Notes
-
-> **Older Wazuh Versions (Before 4.8)**
->
-> Earlier versions of Wazuh used **Elasticsearch** as the backend for storing and indexing alerts. In these deployments, **Filebeat** was a standard component responsible for forwarding alerts from the Wazuh Manager to Elasticsearch. Because of this, many architecture diagrams and tutorials included Filebeat as one of the primary components.
-
-> **Modern Wazuh Versions (4.8+)**
->
-> Beginning with Wazuh 4.8, the official architecture emphasizes four primary components:
->
-> - Wazuh Manager
-> - Wazuh Agent
-> - Wazuh Indexer
-> - Wazuh Dashboard
->
-> The Wazuh Indexer, which is based on **OpenSearch**, replaced the previous Elasticsearch-based architecture. As a result, Filebeat is no longer highlighted as a core architectural component in the official documentation.
->
-> However, Filebeat is **not obsolete**. It is still used in many deployments, migration scenarios, upgrades, and environments that were originally built using earlier Wazuh versions. Therefore, administrators may continue to encounter Filebeat in production environments, community tutorials, and existing infrastructure.
-
-### Why the Change?
-
-The change was made to simplify Wazuh's architecture and reduce its dependency on Elastic's ecosystem.
-
-By adopting the Wazuh Indexer (based on OpenSearch) as its official indexing and search engine, Wazuh established a more integrated architecture centered around its four primary components: **Manager, Agent, Indexer, and Dashboard**.
-
-As a result, modern Wazuh documentation focuses on these core components, while Filebeat is treated as a supporting service rather than a fundamental part of the architecture.
-
----
-
-# Agent-Based Monitoring
-
-The primary method of monitoring systems in Wazuh is through **Wazuh Agents**.
-
-A **Wazuh Agent** is lightweight software installed on an endpoint that continuously monitors the system and securely sends security events to the **Wazuh Manager** for analysis.
-
-The agent collects a wide range of security-related information, including:
-
-- System logs
-- Authentication events
-- Running processes
-- Installed software
-- File modifications
-- Vulnerability information
-- System inventory
-- Security configuration data
-
-Supported operating systems include:
+These include:
 
 - Windows
 - Linux
 - macOS
-- Solaris
-- AIX
+- Docker
+- Kubernetes
+- AWS
+- Microsoft Azure
+- Google Cloud Platform (GCP)
+- Virtual Machines
+- Network Devices
+- Syslog-enabled appliances
 
-Because the agent runs directly on the monitored endpoint, it provides deep visibility into system activity and enables advanced monitoring capabilities such as:
+This flexibility allows organizations to monitor hybrid environments from a single management platform.
 
-- File Integrity Monitoring (FIM)
-- Vulnerability Detection
-- Security Configuration Assessment (SCA)
-- Rootcheck
-- Active Response
-- Endpoint Inventory
-
-## How It Works
-
-The following diagram illustrates the flow of security events in an **agent-based** Wazuh deployment.
-
-```text
-+-------------------------+
-| Security Event Occurs   |
-| (e.g., login, file      |
-| change, new process)    |
-+-------------------------+
-            │
-            ▼
-+-------------------------+
-| Wazuh Agent             |
-| Collects event data     |
-+-------------------------+
-            │
-            │ Secure communication
-            │ (Encrypted)
-            ▼
-+-------------------------+
-| Wazuh Manager           |
-| Receives the event      |
-+-------------------------+
-            │
-            ▼
-+-------------------------+
-| Decoders                |
-| Parse & normalize logs  |
-+-------------------------+
-            │
-            ▼
-+-------------------------+
-| Rules Engine            |
-| Evaluates the event     |
-+-------------------------+
-            │
-            ▼
-+-------------------------+
-| Alert Generated         |
-+-------------------------+
-            │
-            ▼
-+-------------------------+
-| Wazuh Indexer           |
-| Stores & indexes data   |
-+-------------------------+
-            │
-            ▼
-+-------------------------+
-| Wazuh Dashboard         |
-| Displays alerts         |
-+-------------------------+
-            │
-            ▼
-+-------------------------+
-| Security Analyst        |
-| Investigates alert      |
-+-------------------------+
-```
-
-### Workflow Summary
-
-1. A security event occurs on a monitored endpoint.
-2. The **Wazuh Agent** detects and collects information about the event.
-3. The agent securely forwards the event to the **Wazuh Manager**.
-4. The Manager uses **Decoders** to parse and normalize the incoming data.
-5. The **Rules Engine** evaluates the event against predefined and custom detection rules.
-6. If a rule is matched, an alert is generated.
-7. The alert is forwarded to the **Wazuh Indexer**, where it is stored and indexed.
-8. The **Wazuh Dashboard** retrieves the alert from the Indexer and displays it.
-9. A **Security Analyst** reviews the alert, investigates the event, and determines the appropriate response.
-    
 ---
 
-# Agentless Monitoring
+# Deployment Models
 
-Although **agent-based monitoring** is the preferred method in Wazuh, some systems do not allow third-party software to be installed or are not compatible with the Wazuh Agent.
+Wazuh supports two primary monitoring methods.
 
-Examples include:
+## Agent-Based Monitoring
 
-- Network switches
-- Routers
-- Firewalls
-- Legacy servers
-- Embedded devices
-- Third-party appliances
+The preferred deployment model.
 
-For these systems, Wazuh provides **Agentless Monitoring**, allowing the **Wazuh Manager** to collect security information remotely without installing an agent on the monitored device.
+A lightweight **Wazuh Agent** is installed on monitored systems to continuously collect security events and send them securely to the Wazuh Manager.
 
-Depending on the device and configuration, the Manager can collect data using protocols such as:
+Agent-based monitoring provides the deepest visibility and supports advanced capabilities such as:
+
+- File Integrity Monitoring
+- Vulnerability Detection
+- Active Response
+- Security Configuration Assessment
+- Endpoint Inventory
+
+---
+
+## Agentless Monitoring
+
+Some systems cannot run additional software.
+
+For these systems, Wazuh supports **Agentless Monitoring**, where the Wazuh Manager remotely collects information using technologies such as:
 
 - SSH
 - Syslog
 
-Unlike agent-based monitoring, the Manager does not have direct access to the operating system. Instead, it retrieves logs or command output remotely for analysis.
+Although this provides useful visibility, it offers fewer capabilities than agent-based monitoring because the Manager does not have direct access to the operating system.
 
-Because no agent is installed, agentless monitoring offers fewer capabilities than agent-based monitoring. Features such as:
+---
 
-- File Integrity Monitoring (FIM)
-- Vulnerability Detection
-- Security Configuration Assessment (SCA)
-- Rootcheck
-- Endpoint Inventory
-- Active Response
+# High-Level Architecture
 
-are generally unavailable or significantly limited.
+Every Wazuh deployment is built around four primary components.
 
-For this reason, organizations typically use **agent-based monitoring whenever possible**, reserving agentless monitoring for systems where installing an agent is impractical or unsupported.
+| Component | Purpose |
+|------------|---------|
+| **Manager** | Collects and analyzes security events. |
+| **Agent** | Collects data from monitored endpoints. |
+| **Indexer** | Stores and indexes alerts. |
+| **Dashboard** | Web interface used to visualize and manage alerts. |
 
-## How It Works
+> **Note**
+>
+> Some older Wazuh deployments also include **Filebeat** as a supporting component for forwarding alerts between the Manager and the Indexer. Modern Wazuh documentation (4.8+) focuses on the four primary components listed above.
 
-The following diagram illustrates the flow of security events in an **agentless** Wazuh deployment.
+A more detailed explanation of these components is provided in the **Core Components** section of this knowledge base.
+
+---
+
+# How Wazuh Works (High-Level)
+
+The overall workflow can be summarized as:
 
 ```text
-+---------------------------+
-| Security Event Occurs     |
-| (Router, Firewall, etc.)  |
-+---------------------------+
-             │
-             ▼
-+---------------------------+
-| SSH / Syslog              |
-| Remote data collection    |
-+---------------------------+
-             │
-             ▼
-+---------------------------+
-| Wazuh Manager             |
-| Receives logs/events      |
-+---------------------------+
-             │
-             ▼
-+---------------------------+
-| Decoders                  |
-| Parse & normalize logs    |
-+---------------------------+
-             │
-             ▼
-+---------------------------+
-| Rules Engine              |
-| Evaluates the event       |
-+---------------------------+
-             │
-             ▼
-+---------------------------+
-| Alert Generated           |
-+---------------------------+
-             │
-             ▼
-+---------------------------+
-| Wazuh Indexer             |
-| Stores & indexes data     |
-+---------------------------+
-             │
-             ▼
-+---------------------------+
-| Wazuh Dashboard           |
-| Displays alerts           |
-+---------------------------+
-             │
-             ▼
-+---------------------------+
-| Security Analyst          |
-| Investigates alert        |
-+---------------------------+
+Security Event
+      │
+      ▼
+ Agent / SSH / Syslog
+      │
+      ▼
+ Wazuh Manager
+      │
+      ▼
+ Decoders & Rules
+      │
+      ▼
+ Alert Generated
+      │
+      ▼
+ Wazuh Indexer
+      │
+      ▼
+ Wazuh Dashboard
+      │
+      ▼
+ Security Analyst
 ```
 
-### Workflow Summary
+The detailed event processing workflow is covered separately in **Wazuh-Workflow.md**.
 
-1. A security event occurs on a device that cannot run a Wazuh Agent.
-2. The **Wazuh Manager** remotely collects logs or command output using **SSH** or receives logs through **Syslog**.
-3. The Manager receives the collected data.
-4. **Decoders** parse and normalize the incoming information.
-5. The **Rules Engine** evaluates the event against predefined and custom detection rules.
-6. If a rule is matched, an alert is generated.
-7. The alert is stored and indexed by the **Wazuh Indexer**.
-8. The **Wazuh Dashboard** retrieves the alert from the Indexer and displays it.
-9. A **Security Analyst** reviews the alert and investigates the event.
+---
+
+# Real-World Example
+
+An employee accidentally downloads malware onto a Windows workstation.
+
+1. The Wazuh Agent detects that a protected file has been modified.
+2. The event is securely transmitted to the Wazuh Manager.
+3. The Manager analyzes the event using Decoders and Rules.
+4. An alert is generated.
+5. The alert is stored in the Wazuh Indexer.
+6. The Dashboard displays the alert.
+7. A security analyst investigates the affected system and determines the appropriate response.
+
+---
+
+# What You'll Learn Next
+
+This document provides a high-level introduction to Wazuh.
+
+The following documents explore each topic in greater detail:
+
+- What is SIEM?
+- What is XDR?
+- Wazuh Architecture
+- Wazuh Workflow
+- Wazuh Manager
+- Wazuh Agent
+- Wazuh Indexer
+- Wazuh Dashboard
+- Decoders
+- Rules
 
 ---
 
 ## Key Takeaways
 
 - Wazuh is an open-source SIEM and XDR platform.
-- It centralizes security monitoring across multiple systems.
-- The four primary components are the Manager, Agent, Indexer, and Dashboard.
-- Filebeat appears in many older deployments but is not emphasized in modern 4.8+ architecture.
-- Wazuh supports log analysis, threat detection, compliance monitoring, vulnerability detection, and incident response.
+- It centralizes security monitoring across diverse environments.
+- It supports both agent-based and agentless monitoring.
+- Its architecture is built around four primary components: Manager, Agent, Indexer, and Dashboard.
+- Wazuh transforms raw security events into actionable alerts that help security teams detect, investigate, and respond to threats.
+
+---
 
 ## References
 
-- Wazuh Documentation – Architecture
-  https://documentation.wazuh.com/current/getting-started/architecture.html
-
-- Wazuh Documentation – Getting Started
+- Wazuh Documentation – Getting Started  
   https://documentation.wazuh.com/current/getting-started/index.html
 
-- Wazuh Documentation – Components
+- Wazuh Documentation – Architecture  
+  https://documentation.wazuh.com/current/getting-started/architecture.html
+
+- Wazuh Documentation – Components  
   https://documentation.wazuh.com/current/getting-started/components/index.html
