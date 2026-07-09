@@ -172,9 +172,9 @@ As a result, modern Wazuh documentation focuses on these core components, while 
 
 The primary method of monitoring systems in Wazuh is through **Wazuh Agents**.
 
-A **Wazuh Agent** is lightweight software installed on an endpoint that continuously monitors the system and securely sends security events to the Wazuh Manager for analysis.
+A **Wazuh Agent** is lightweight software installed on an endpoint that continuously monitors the system and securely sends security events to the **Wazuh Manager** for analysis.
 
-The agent collects information such as:
+The agent collects a wide range of security-related information, including:
 
 - System logs
 - Authentication events
@@ -193,44 +193,93 @@ Supported operating systems include:
 - Solaris
 - AIX
 
-Because the agent runs directly on the monitored endpoint, it provides deep visibility into system activity and enables advanced monitoring features such as File Integrity Monitoring (FIM), Vulnerability Detection, Security Configuration Assessment (SCA), and Active Response.
+Because the agent runs directly on the monitored endpoint, it provides deep visibility into system activity and enables advanced monitoring capabilities such as:
 
-##How it works
+- File Integrity Monitoring (FIM)
+- Vulnerability Detection
+- Security Configuration Assessment (SCA)
+- Rootcheck
+- Active Response
+- Endpoint Inventory
 
-                 Agent-Based Monitoring
-                 ----------------------
-                 Security Event
-      │
-      ▼
-Wazuh Agent
-      │
-      ▼
-Secure Communication
-      │
-      ▼
-Wazuh Manager
-      │
-      ▼
-Rules & Decoders
-      │
-      ▼
-Alert Generated
-      │
-      ▼
-Indexer
-      │
-      ▼
-Dashboard
-      │
-      ▼
-Security Analyst
+## How It Works
 
+The following diagram illustrates the flow of security events in an **agent-based** Wazuh deployment.
 
+```text
++-------------------------+
+| Security Event Occurs   |
+| (e.g., login, file      |
+| change, new process)    |
++-------------------------+
+            │
+            ▼
++-------------------------+
+| Wazuh Agent             |
+| Collects event data     |
++-------------------------+
+            │
+            │ Secure communication
+            │ (Encrypted)
+            ▼
++-------------------------+
+| Wazuh Manager           |
+| Receives the event      |
++-------------------------+
+            │
+            ▼
++-------------------------+
+| Decoders                |
+| Parse & normalize logs  |
++-------------------------+
+            │
+            ▼
++-------------------------+
+| Rules Engine            |
+| Evaluates the event     |
++-------------------------+
+            │
+            ▼
++-------------------------+
+| Alert Generated         |
++-------------------------+
+            │
+            ▼
++-------------------------+
+| Wazuh Indexer           |
+| Stores & indexes data   |
++-------------------------+
+            │
+            ▼
++-------------------------+
+| Wazuh Dashboard         |
+| Displays alerts         |
++-------------------------+
+            │
+            ▼
++-------------------------+
+| Security Analyst        |
+| Investigates alert      |
++-------------------------+
+```
+
+### Workflow Summary
+
+1. A security event occurs on a monitored endpoint.
+2. The **Wazuh Agent** detects and collects information about the event.
+3. The agent securely forwards the event to the **Wazuh Manager**.
+4. The Manager uses **Decoders** to parse and normalize the incoming data.
+5. The **Rules Engine** evaluates the event against predefined and custom detection rules.
+6. If a rule is matched, an alert is generated.
+7. The alert is forwarded to the **Wazuh Indexer**, where it is stored and indexed.
+8. The **Wazuh Dashboard** retrieves the alert from the Indexer and displays it.
+9. A **Security Analyst** reviews the alert, investigates the event, and determines the appropriate response.
+    
 ---
 
 # Agentless Monitoring
 
-Although agent-based monitoring is the preferred approach, not every system allows third-party software to be installed.
+Although **agent-based monitoring** is the preferred method in Wazuh, some systems do not allow third-party software to be installed or are not compatible with the Wazuh Agent.
 
 Examples include:
 
@@ -241,42 +290,97 @@ Examples include:
 - Embedded devices
 - Third-party appliances
 
-For these systems, Wazuh supports **Agentless Monitoring**.
+For these systems, Wazuh provides **Agentless Monitoring**, allowing the **Wazuh Manager** to collect security information remotely without installing an agent on the monitored device.
 
-Instead of installing an agent, the Wazuh Manager remotely collects information using protocols such as:
+Depending on the device and configuration, the Manager can collect data using protocols such as:
 
 - SSH
 - Syslog
 
-Because no software is installed on the monitored device, agentless monitoring offers fewer capabilities than agent-based monitoring. It cannot continuously inspect the operating system or provide advanced endpoint monitoring features such as File Integrity Monitoring (FIM), Vulnerability Detection, or Security Configuration Assessment (SCA).
+Unlike agent-based monitoring, the Manager does not have direct access to the operating system. Instead, it retrieves logs or command output remotely for analysis.
 
-Organizations typically use **agent-based monitoring whenever possible** and reserve agentless monitoring for systems where installing an agent is impractical or unsupported.
+Because no agent is installed, agentless monitoring offers fewer capabilities than agent-based monitoring. Features such as:
 
-##How it works
+- File Integrity Monitoring (FIM)
+- Vulnerability Detection
+- Security Configuration Assessment (SCA)
+- Rootcheck
+- Endpoint Inventory
+- Active Response
 
-               Agentless Monitoring
-               --------------------
+are generally unavailable or significantly limited.
 
-        Security Event on Device
-                    │
-          SSH / Syslog Collection
-                    │
-                    ▼
-              Wazuh Manager
-                    │
-        Rule & Decoder Analysis
-                    │
-                    ▼
-             Alert Generated
-                    │
-                    ▼
-              Wazuh Indexer
-                    │
-                    ▼
-             Wazuh Dashboard
-                    │
-                    ▼
-             Security Analyst
+For this reason, organizations typically use **agent-based monitoring whenever possible**, reserving agentless monitoring for systems where installing an agent is impractical or unsupported.
+
+## How It Works
+
+The following diagram illustrates the flow of security events in an **agentless** Wazuh deployment.
+
+```text
++---------------------------+
+| Security Event Occurs     |
+| (Router, Firewall, etc.)  |
++---------------------------+
+             │
+             ▼
++---------------------------+
+| SSH / Syslog              |
+| Remote data collection    |
++---------------------------+
+             │
+             ▼
++---------------------------+
+| Wazuh Manager             |
+| Receives logs/events      |
++---------------------------+
+             │
+             ▼
++---------------------------+
+| Decoders                  |
+| Parse & normalize logs    |
++---------------------------+
+             │
+             ▼
++---------------------------+
+| Rules Engine              |
+| Evaluates the event       |
++---------------------------+
+             │
+             ▼
++---------------------------+
+| Alert Generated           |
++---------------------------+
+             │
+             ▼
++---------------------------+
+| Wazuh Indexer             |
+| Stores & indexes data     |
++---------------------------+
+             │
+             ▼
++---------------------------+
+| Wazuh Dashboard           |
+| Displays alerts           |
++---------------------------+
+             │
+             ▼
++---------------------------+
+| Security Analyst          |
+| Investigates alert        |
++---------------------------+
+```
+
+### Workflow Summary
+
+1. A security event occurs on a device that cannot run a Wazuh Agent.
+2. The **Wazuh Manager** remotely collects logs or command output using **SSH** or receives logs through **Syslog**.
+3. The Manager receives the collected data.
+4. **Decoders** parse and normalize the incoming information.
+5. The **Rules Engine** evaluates the event against predefined and custom detection rules.
+6. If a rule is matched, an alert is generated.
+7. The alert is stored and indexed by the **Wazuh Indexer**.
+8. The **Wazuh Dashboard** retrieves the alert from the Indexer and displays it.
+9. A **Security Analyst** reviews the alert and investigates the event.
 
 ---
 
